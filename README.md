@@ -52,14 +52,6 @@ https://github.com/user-attachments/assets/e741ad56-0175-4e93-a27b-ea04dcbcde49
 
 ---
 
-## ⏳ Próximos Passos (Roadmap)
-- [ ] Finalização das funções de persistência no database.py.
-- [ ] Conexão final do comando /setupnews com a gravação do servidor/canal no SQLite.
-- [ ] Migração do ambiente de teste (tasks_teste.py) para o agendador oficial de produção (tasks_bot.py).
-- [ ] Validação do build final no ambiente containerizado com Docker.
-
----
-
 <p align="center">
   Desenvolvido como Desafio para a comunidade <b>Tech Girls</b> 💜
 </p>
