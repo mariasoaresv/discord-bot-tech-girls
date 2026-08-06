@@ -1,120 +1,65 @@
 # Discord Bot - Tech Girls
 
+> [!NOTE]
+> **Projeto em Desenvolvimento / Fase de Ajustes:** Este repositório encontra-se atualmente em fase de testes e integração.
+
 ## Objetivo
 
-Desenvolver um bot para a comunidade Tech Girls, integrada ao Discord, que automatize o compartilhamento de notícias de tecnologia por meio da API do TabNews e divulgue vagas na área tech.
+Bot do Discord para a comunidade Tech Girls, desenvolvido para automatizar a analise e o envio de notícias de tecnologia relevantes utilizando Web Scraping, Inteligência Artificial (Google Gemini) e agendamento de tarefas.
 
-## Equipe
+---
 
-- Thais
-- Maria
-- Lucila
-- Andressa
+## 👥Equipe do Projeto e Atribuicoes
+
+O projeto foi construído de forma colaborativa, onde cada desenvolvedora ficou responsável por um pilar essencial:
+
+* **Maria Fernanda** (Eu 🚀).
+* **Lucila:** Agente de IA. Engenharia de Prompt e Integração com a **IA (Google Gemini)**, além de toda a **Containerização e ambiente Docker** da aplicação.
+* **Thais:** Modelagem do **Banco de Dados (SQLite)** e desenvolvimento das **funções do `database.py`** para persistência de dados.
+* **Andressa:** Gestão de **Documentação Geral e Completa do Projeto**
+
+---
   
-## Stack
+## Sobre este Fork & Minhas Contribuições ✨
 
-- Python 3.14
-- discord.py
-- SQLite Studio
-- API TabNews
+Este repositório é um **Fork** focado na implementação e validação da **arquitetura de Tasks, orquestração de comandos Slash e pipeline de entregas do Discord**.
 
-## Banco de Dados
+### O que foi desenvolvido por mim:
 
-Tabela 1: noticias_postadas
+* **(`news_search.py`):** Coleta e extração assíncrona das notícias diretamente da API/página do TabNews, estruturando os dados para consumo da IA e envio para o banco de dados.
+* **(`embeds.py`):** Formatação visual das mensagens no Discord (layout, cores, campos de tags, local para o resumo gerado pela IA e botões com links de acesso direto à matéria).
+* **Comando `/setupnews` (`setup_channel.py`):** Criação do comando Slash com validação de permissões de administrador (`administrator=True`) para capturar e vincular o ID do Servidor (`guild_id`) e do Canal (`channel_id`), enviando-os para o banco de dados.
+* **Arquitetura & Otimização de Tasks (`TasksBot`):** Projeção do ciclo de vida da rotina em segundo plano. A Task permanece **inativa** por padrão, economizando o uso da API do Gemini enquanto não houver canais cadastrados. O comando `/setupnews` atua como gatilho automático para "acordar" e iniciar a execução (`.start()`) das tasks.
+* **Ambiente de Testes Banco de dados "fake" (`TasksTeste`):** Criação testes isolados com banco de dados simulado (*Mock*) e intervalo de execução reduzido, permitindo validar a esteira completa de envio (*Scraping → Análise de IA → Embed no Discord*) sem dependências do banco real.
 
-Guarda o ID da notícia, evitando duplicidade.
+---
 
-Colunas
-- id_noticia - id da notícia conforme no site TabNews
-- titulo - título da notícia postada no TabNews
-- url - url da notícia
-- autor - identificação de quem postou a notícia no site
-- tag - classificador de assunto da notícia
-- postado_em - data em que a notícia foi postada no bot
+## 🎬 Demonstração do Teste em Execução:
 
-Tabela 2: canais_configurados
+> O vídeo abaixo mostra a validação em tempo real da esteira de testes capturando as notícias, processando via Gemini e disparando os Embeds formatados no Discord:
 
-Guarda em qual servidor/canal o bot deve postar
+https://github.com/user-attachments/assets/e741ad56-0175-4e93-a27b-ea04dcbcde49
 
-Colunas
-- id_canal - id gerado internamente para o canal de notícias
-- id_guild - id do servidor discord
-- id_channel - identificador do discord
-- criado_em - data de criação do servidor
+---
 
-## Como rodar com Docker
+## 🛠️ Tecnologias & Libs Utilizadas
 
-### Pré-requisitos
+* **Python 3.11**
+* **discord.py**: Framework para comandos Slash, Cogs e gerenciamento do Bot.
+* **google-generativeai / Gemini API**: Validação, sumarização e categorização do conteúdo das notícias.
+* **BeautifulSoup4 / aiohttp**: Web Scraping e requisições assíncronas ao TabNews.
+* **python-dotenv**: Gerenciamento de variáveis de ambiente de forma segura.
 
-- Docker instalado
-- Docker Compose instalado (ou plugin `docker compose`)
+---
 
-### 1) Configurar variáveis de ambiente
+## ⏳ Próximos Passos (Roadmap)
+- [ ] Finalização das funções de persistência no database.py.
+- [ ] Conexão final do comando /setupnews com a gravação do servidor/canal no SQLite.
+- [ ] Migração do ambiente de teste (tasks_teste.py) para o agendador oficial de produção (tasks_bot.py).
+- [ ] Validação do build final no ambiente containerizado com Docker.
 
-Na raiz do projeto, crie seu arquivo `.env` a partir do exemplo:
+---
 
-```bash
-cp .env.example .env
-```
-
-Edite o arquivo `.env` e preencha, no mínimo:
-
-- `GEMINI_API_KEY`
-
-Observação:
-- `BOT_TOKEN` e `DEV_GUILD_ID` só são necessários quando for executar o bot completo no Discord.
-
-### 2) Build da imagem
-
-```bash
-docker compose build
-```
-
-### 3) Subir a aplicação
-
-```bash
-docker compose up
-```
-
-Para rodar em segundo plano:
-
-```bash
-docker compose up -d
-```
-
-### 4) Ver logs da execução
-
-```bash
-docker compose logs -f
-```
-
-### 5) Parar os containers
-
-```bash
-docker compose down
-```
-
-## Fluxo executado no container hoje
-
-O container está configurado para executar o arquivo `main_teste.py`, que faz:
-
-1. Busca notícias na API do TabNews
-2. Envia conteúdo para validação no Gemini
-3. Exibe no terminal o JSON retornado pela validação
-
-Os arquivos em `Validador_IA/dados_teste/` são apenas artefatos de teste e não fazem parte do fluxo final de produção.
-
-
-## Dependências
-
-Para rodar o bot e os serviços de busca de notícias, o projeto utiliza as seguintes bibliotecas Python:
-
-* **`discord.py`**: Framework para interação com a API do Discord.
-* **`aiohttp`**: Biblioteca assíncrona para requisições HTTP (instalada automaticamente junto com o `discord.py`), utilizada na integração com a API do TabNews.
-* **`python-dotenv`**: Gerenciamento de variáveis de ambiente (chaves de API, ID do servidor de testes e tokens).
-
-### Para instalar as dependências
-No terminal, instale os pacotes necessários:
-
-```bash
-pip install discord.py python-dotenv
+<p align="center">
+  Desenvolvido como Desafio para a comunidade <b>Tech Girls</b> 💜
+</p>
